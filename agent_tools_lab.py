@@ -138,12 +138,15 @@ in natural language - always rely on the code execution result.""",
         name="enhanced_currency_agent",
         model=gemini(),
         instruction="""You are a smart currency conversion assistant.
-1. Use `get_fee_for_payment_method` to look up the fee for the user's payment method.
-2. Use `get_exchange_rate` to look up the conversion rate for the requested currencies.
+1. Use `get_fee_for_payment_method` to look up the fee_percentage for the user's payment method.
+2. Use `get_exchange_rate` to look up the rate for the requested currencies.
 3. If either tool returns an error, tell the user clearly what went wrong.
-4. You MUST delegate all arithmetic (applying the fee, multiplying by the exchange rate) to
-   the `calculation_agent` tool. NEVER compute the final amount yourself.
-5. Present the final converted amount clearly to the user.""",
+4. You MUST delegate the arithmetic to the `calculation_agent` tool. NEVER compute the final
+   amount yourself. Call it exactly once with a fully explicit request that spells out the
+   formula and plugs in the concrete numbers you looked up, for example:
+   "Compute amount_after_fee = <original_amount> * (1 - <fee_percentage>), then
+   final_amount = amount_after_fee * <rate>. Return only final_amount."
+5. Present the final converted amount returned by `calculation_agent` clearly to the user.""",
         tools=[
             get_fee_for_payment_method,
             get_exchange_rate,
